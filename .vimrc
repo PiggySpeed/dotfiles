@@ -1,6 +1,3 @@
-" Vim Plug (https://github.com/junegunn/vim-plug)
-
-
 " ---------------------------------------------------------
 " AUTO-INSTALL VIM PLUG 
 "
@@ -11,17 +8,14 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+
 " ---------------------------------------------------------
 " START CONFIG 
 "
 " ---------------------------------------------------------
 call plug#begin('~/.vim/bundle')
 
-syntax on
-set encoding=utf-8
-
-Plug 'whatyouhide/vim-gotham'
-Plug 'ryanss/vim-hackernews'
+Plug 'whatyouhide/vim-gotham'        " gotham color scheme
 Plug 'tmhedberg/SimpylFold'          " smart folding of python code
 Plug 'vim-scripts/indentpython.vim'  " for Python autoindentation
 "Plug 'Valloric/YouCompleteMe'        " code autocompletion
@@ -34,22 +28,27 @@ Plug 'kien/ctrlp.vim'                " global search with CTRL-P
 Plug 'tpope/vim-fugitive'            " git integration
 Plug 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'} " vim status bar
 
+call plug#end()
+
 " ---------------------------------------------------------
 " GENERAL CONFIGURATIONS
 "
 " ---------------------------------------------------------
 
-" nerdtree configs
-let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
-map <C-n> :NERDTreeToggle<CR>
+syntax on
+set encoding=utf-8
+
+" nerdtree config - no longer usings
+"let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+"map <C-n> :NERDTreeToggle<CR>
 
 "          let nerdtree open by default when entering \"vim\"
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+"autocmd StdinReadPre * let s:std_in=1
+"autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-let NERDTreeAutoDeleteBuffer = 1 " delete buffer of files we delete
-let NERDTreeMinimalUI = 1 " UI
-let NERDTreeDirArrows = 1 " UI
+"let NERDTreeAutoDeleteBuffer = 1 " delete buffer of files we delete
+"let NERDTreeMinimalUI = 1 " UI
+"let NERDTreeDirArrows = 1 " UI
 
 " split navigations
 nnoremap <C-J> <C-W><C-J>
@@ -235,8 +234,6 @@ set statusline+=\ [%b][0x%B]\               " ASCII and byte code under cursor
 
 " set color of vertical split line
 hi VertSplit ctermbg=NONE ctermfg=NONE 
-
-call plug#end()
 
 " colorscheme configs
 colorscheme gotham

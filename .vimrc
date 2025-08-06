@@ -1,4 +1,14 @@
 " ---------------------------------------------------------
+" Useful References 
+"
+" ---------------------------------------------------------
+" How to use augroup: https://vi.stackexchange.com/questions/9455/why-should-i-use-augroup
+" maybe upgrade to lazygit later: https://github.com/jesseduffield/lazygit
+
+" Setting up vim for go development: https://pmihaylov.com/vim-for-go-development
+
+
+" ---------------------------------------------------------
 " AUTO-INSTALL VIM PLUG 
 "
 " ---------------------------------------------------------
@@ -13,42 +23,91 @@ endif
 " START CONFIG 
 "
 " ---------------------------------------------------------
-call plug#begin('~/.vim/bundle')
-
-Plug 'whatyouhide/vim-gotham'        " gotham color scheme
-Plug 'tmhedberg/SimpylFold'          " smart folding of python code
-Plug 'vim-scripts/indentpython.vim'  " for Python autoindentation
-"Plug 'Valloric/YouCompleteMe'        " code autocompletion
-Plug 'scrooloose/syntastic'          " python syntax checking
-Plug 'nvie/vim-flake8'               " python PEP-8 checking
-Plug 'leafgarland/typescript-vim'    " typescript syntax checking
-Plug 'scrooloose/nerdtree'           " tree explorer
-Plug 'jistr/vim-nerdtree-tabs'       " tabs
-Plug 'kien/ctrlp.vim'                " global search with CTRL-P
-Plug 'tpope/vim-fugitive'            " git integration
-Plug 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'} " vim status bar
-
+call plug#begin('~/.vim/autoload')
+  Plug 'whatyouhide/vim-gotham'        " gotham color scheme
+  Plug 'tmhedberg/SimpylFold'          " smart folding of python code
+  Plug 'vim-scripts/indentpython.vim'  " for Python autoindentation
+  Plug 'scrooloose/syntastic'          " python syntax checking
+  Plug 'nvie/vim-flake8'               " python PEP-8 checking
+  Plug 'leafgarland/typescript-vim'    " typescript syntax checking
+  Plug 'scrooloose/nerdtree'           " tree explorer
+  Plug 'jistr/vim-nerdtree-tabs'       " tabs
+  Plug 'kien/ctrlp.vim'                " global search with CTRL-P
+  Plug 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'} " vim status bar
+	Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' } " Go development
 call plug#end()
+
+" ---------------------------------------------------------
+" Welcome Message 
+"
+" ---------------------------------------------------------
+:echom '(>^.^<)'
+
 
 " ---------------------------------------------------------
 " GENERAL CONFIGURATIONS
 "
 " ---------------------------------------------------------
-
 syntax on
 set encoding=utf-8
 
+set fillchars+=vert:\  " split windows border character 
+set foldmethod=indent " enable folding
+set foldlevel=99 " enable folding
+set nu " set line numbers
+set clipboard=unnamed " Allow access to clipboards from other applications
+set whichwrap+=<,>,h,l,[,] " Move up/down lines when reaching the beginnin/end of a line
+
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+
+set backspace=indent,eol,start
+"set modifiable " makes the buffer modifiable in NERDTree
+
+" remap window cycling to ctrl+hjkl
+nnoremap <C-H> <C-W>h
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+nnoremap <C-L> <C-W>l
+
+augroup User
+  :echo '[autocmd] Python'
+  au BufNewFile,BufRead *.py
+    \ set textwidth=79 |
+    \ set expandtab |
+    \ set autoindent |
+    \ set fileformat=unix |
+    \ match BadWhitespace /\s\+$/ " mark extra whitespace
+  " :echo '[autocmd] Webdev'
+  " au BufNewFile,BufRead *.js,*.html,*.css
+  :echo '[autocmd] C/C++'
+  au BufNewFile,BufRead *.h,*.c
+    \ set exrc |
+    \ set secure |
+    \ set noexpandtab |
+    \ set expandtab |
+    \ set autoindent | 
+    \ set smartindent |
+    \ set filetype=c.doxygen |
+    \ hi ColorColumn ctermbg=darkgrey
+
+  :echo '[autocmd] statusline'
+  " have different colors for entering/leaving insert mode
+   au InsertEnter * call InsertStatuslineColor(v:insertmode)
+   au InsertLeave * hi statusline guibg=NONE ctermfg=LightGrey guifg=White ctermbg=NONE
+augroup END
+
+
 " nerdtree config - no longer usings
 "let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
-"map <C-n> :NERDTreeToggle<CR>
-
-"          let nerdtree open by default when entering \"vim\"
+"map <C-n> :NERDTreeToggle<CR> "let nerdtree open by default when entering vim
 "autocmd StdinReadPre * let s:std_in=1
 "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 "let NERDTreeAutoDeleteBuffer = 1 " delete buffer of files we delete
 "let NERDTreeMinimalUI = 1 " UI
-"let NERDTreeDirArrows = 1 " UI
+let NERDTreeDirArrows = 1 " UI
 
 " split navigations
 nnoremap <C-J> <C-W><C-J>
@@ -56,26 +115,9 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
-set splitbelow " split new windows to bottom
-set fillchars+=vert:\  " split windows border character 
-
 " hi VertSplit guibg=NONE guifg=NONE " split windows border color
 " hi VertSplit ctermbg=Black ctermfg=Black
 " hi vertsplit guifg=Black guibg=Black
-
-" Enable folding
-set foldmethod=indent
-set foldlevel=99
-
-" Enable line numbers
-set nu
-
-" Allow access to clipboards from other applications
-set clipboard=unnamed
-
-" Move up/down lines when reaching the beginnin/end of a line
-set whichwrap+=<,>,h,l,[,]
-
 " Enable folding with the spacebar
 nnoremap <space> za
 
@@ -84,16 +126,6 @@ nnoremap <space> za
 " PYTHON CONFIGURATIONS
 "
 " ---------------------------------------------------------
-au BufNewFile,BufRead *.py
-	\ set tabstop=2 | 
-	\ set softtabstop=2 |
-	\ set shiftwidth=2 |
-	\ set textwidth=79 |
-  \ set expandtab |
-	\ set autoindent |
-	\ set fileformat=unix |
- 	\ match BadWhitespace /\s\+$/ " mark extra whitespace
-
 function Py2()
   let g:syntastic_python_python_exec = '/usr/local/bin/python2.7'
 endfunction
@@ -107,10 +139,7 @@ let g:syntastic_python_checkers = ['python3']
 
 "call Py3()   " default to Py3 because I try to use it when possible
 
-"au BufRead,BufNewFile *.py,*.pyw,*.c,*.h
-"	\ match BadWhitespace /\s\+$/ " mark extra whitespace
-
-highlight BadWhitespace ctermbg=red guibg=red " set highlight color for BadWhitespace
+" highlight BadWhitespace ctermbg=red guibg=red " set highlight color for BadWhitespace
 
 " let g:ycm_autoclose_preview_window_after_completion=1 " autoclose autocomplete window
 " map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
@@ -132,58 +161,59 @@ match OverLength /\%81v.\+/
 
 " make python pretty
 let python_highlight_all=1
-syntax on
 
 " ---------------------------------------------------------
-" WEB DEV CONFIGURATIONS 
-"
+" Go DEV CONFIGURATIONS 
+" based on https://pmihaylov.com/vim-for-go-development/
 " ---------------------------------------------------------
-au BufNewFile,BufRead *.js,*.html,*.css set tabstop=2 softtabstop=2 shiftwidth=2
 
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_generate_tags = 1
+
+" disable all linters as that is taken care of by coc.nvim
+let g:go_diagnostics_enabled = 0
+let g:go_metalinter_enabled = []
+
+" don't jump to errors after metalinter is invoked
+let g:go_jump_to_error = 0
+
+" run go imports on file save
+let g:go_fmt_command = "goimports"
+
+" automatically highlight variable your cursor is on
+let g:go_auto_sameids = 0
 
 " ---------------------------------------------------------
 " C/C++ CONFIGURATIONS
 "
 " ---------------------------------------------------------
-set exrc
-set secure
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
-set noexpandtab
-set expandtab
-set autoindent
-set smartindent
-set backspace=indent,eol,start
-
-hi ColorColumn ctermbg=darkgrey
-augroup project
-    autocmd!
-    autocmd BufRead,BufNewFile *.h,*.c set filetype=c.doxygen
-augroup END 
-let &path.="src/include,/usr/include/AL," 
-
+let &path.="src/include,/usr/include/AL,"
 let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py" " YCM Autocomplete
 
 
 " ---------------------------------------------------------
-" Color Scheme
+" Markdown CONFIGURATIONS
 "
 " ---------------------------------------------------------
-hi LineNr 
-  \ term=bold 
-  \ cterm=NONE 
-  \ ctermfg=DarkGrey 
-  \ ctermbg=black 
-  \ gui=NONE 
-  \ guifg=NONE 
-  \ guibg=NONE
+" https://github.com/jincheng9/markdown_supported_languages
+let g:markdown_fenced_languages = ['html', 'js=javascript', 'css', 'go', 'bash', 'yaml', 'sql', 'python']
 
 
 " ---------------------------------------------------------
 " Status Line
-"
+" ref: https://shapeshed.com/vim-statuslines/
 " ---------------------------------------------------------
+
+
+" always show statusline
+"set laststatus=2
+
 
 " have different status line colors depending on current mode
 function! InsertStatuslineColor(mode)
@@ -195,10 +225,6 @@ function! InsertStatuslineColor(mode)
     hi statusline guibg=DarkRed ctermfg=1 guifg=Black ctermbg=0
   endif
 endfunction
-
-" have different colors for entering/leaving insert mode
-au InsertEnter * call InsertStatuslineColor(v:insertmode)
-au InsertLeave * hi statusline guibg=NONE ctermfg=LightGrey guifg=White ctermbg=NONE
 
 " default statusline colors
 hi StatusLine guibg=NONE ctermfg=LightGrey guifg=White ctermbg=NONE
@@ -215,22 +241,29 @@ set statusline+=%m      "modified flag
 set statusline+=%r      "read only flag
 set statusline+=%{fugitive#statusline()} " Puts in the current git status
 
-"if count(g:pathogen_disabled, 'Fugitive') < 1   
-"  set statusline+=%{fugitive#statusline()}
-"endif
 
-" Puts in syntastic warnings
-"    if count(g:pathogen_disabled, 'Syntastic') < 1  
-"        set statusline+=%#warningmsg#
-"        set statusline+=%{SyntasticStatuslineFlag()}
-"        set statusline+=%*
-"    endif
+
 
 set statusline+=\ %=                        " align left
 set statusline+=Line:%l/%L[%p%%]            " line X of Y [percent of file]
 set statusline+=\ Col:%c                    " current column
 set statusline+=\ Buf:%n                    " Buffer number
 set statusline+=\ [%b][0x%B]\               " ASCII and byte code under cursor
+
+
+" ---------------------------------------------------------
+" Color Scheme
+"
+" ---------------------------------------------------------
+hi LineNr 
+  \ term=bold 
+  \ cterm=NONE 
+  \ ctermfg=DarkGrey 
+  \ ctermbg=black 
+  \ gui=NONE 
+  \ guifg=NONE 
+  \ guibg=NONE
+
 
 " set color of vertical split line
 hi VertSplit ctermbg=NONE ctermfg=NONE 
